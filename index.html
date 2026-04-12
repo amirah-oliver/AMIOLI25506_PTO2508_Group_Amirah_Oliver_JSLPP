@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board</title>
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="app">
+<button class="show-sidebar-btn" id="showSidebar">
+  👁
+</button>
+
+    <!-- SIDEBAR -->
+    <nav class="Sidebar">
+
+      <div class="logo-section">
+        <img src="assets/logo-light.svg" alt="Logo" class="logo-full">
+      </div>
+
+      <div class="boards-section">
+        <p class="boards-label">ALL BOARDS (1)</p>
+
+        <div class="board-list">
+          <button class="launch_button">Launch Career</button>
+        </div>
+      </div>
+
+      <!-- DARK MODE TOGGLE --> 
+      <div class="theme-toggle">  
+
+        <span>☀️</span>
+
+        <label class="switch">
+          <input type="checkbox" id="themeToggle">
+          <span class="slider"></span>
+        </label>
+
+        <span>🌑</span>
+
+      </div>
+<button class="hide-sidebar-btn" id="hideSidebar">
+  🚫 Hide Sidebar
+</button>
+<button class="show-sidebar-btn" id="showSidebar">
+  👁
+</button>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+      <div class="main-header">
+        <h1>Launch Career</h1>
+        <button class="add-btn">+ Add New Task</button>
+      </div>
+
+      <!-- BOARD -->
+      <div class="board">
+
+        <!-- TODO COLUMN -->
+        <div class="column" data-status="todo">
+          <h3>TODO (<span class="count">0</span>)</h3>
+
+          <div class="task">
+            <h4>Launch Epic Career 🚀</h4>
+            <p></p>
+          </div>
+
+          <div class="task">
+            <h4>Conquer React ⚛️</h4>
+            <p></p>
+          </div>
+
+          <div class="task">
+            <h4>Understand Databases ⚙️</h4>
+            <p></p>
+          </div>
+
+          <div class="task">
+            <h4>Crush Frameworks 🖼️</h4>
+            <p></p>
+          </div>
+
+        </div>
+
+        <!-- DOING COLUMN -->
+        <div class="column" data-status="doing">
+          <h3>DOING (<span class="count">0</span>)</h3>
+
+          <div class="task">
+            <h4>Master Javascript 💛</h4>
+            <p></p>
+          </div>
+
+          <div class="task">
+            <h4>Never Give Up 🏆</h4>
+            <p></p>
+          </div>
+
+        </div>
+
+        <!-- DONE COLUMN -->
+        <div class="column" data-status="done">
+          <h3>DONE (<span class="count">0</span>)</h3>
+
+          <div class="task">
+            <h4>Explore ES6 Features 🚀</h4>
+            <p></p>
+          </div>
+
+          <div class="task">
+            <h4>Have Fun 🥳</h4>
+            <p></p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- MODAL -->
+  <div class="modal" id="taskModal">
+
+    <div class="modal-content">
+
+      <span class="close-btn">&times;</span>
+
+      <h2 id="modalTitle">Add New Task</h2>
+
+      <input type="text" id="taskTitle" placeholder="Task title">
+
+      <textarea id="taskDesc" placeholder="Task description"></textarea>
+
+      <select id="taskStatus">
+        <option value="todo">todo</option>
+        <option value="doing">doing</option>
+        <option value="done">done</option>
+      </select>
+
+      <button class="save-btn" id="saveTask">Save Task</button>
+
+      <button class="delete-btn" id="deleteTask" style="display:none;">Delete Task</button>
+
+    </div>
+
+  </div>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    const addBtn = document.querySelector(".add-btn");
+    const modal = document.getElementById("taskModal");
+    const closeBtn = document.querySelector(".close-btn");
+    const saveBtn = document.getElementById("saveTask");
+    const deleteBtn = document.getElementById("deleteTask");
+
+    let editTask = null;
+
+    // Open modal
+    addBtn.addEventListener("click", () => {
+
+      modal.style.display = "flex";
+      document.getElementById("modalTitle").innerText = "Add New Task";
+      deleteBtn.style.display = "none";
+
+      editTask = null;
+
+      document.getElementById("taskTitle").value = "";
+      document.getElementById("taskDesc").value = "";
+      document.getElementById("taskStatus").value = "todo";
+
+    });
+
+    // Close modal
+    closeBtn.onclick = () => modal.style.display = "none";
+
+    window.onclick = (e) => {
+      if (e.target == modal) modal.style.display = "none";
+    };
+
+    // Update column counts
+    function updateCounts() {
+
+      document.querySelectorAll(".column").forEach(column => {
+
+        const count = column.querySelectorAll(".task").length;
+        column.querySelector(".count").innerText = count;
+
+      });
+
+    }
+
+    // Save task
+    saveBtn.onclick = () => {
+
+      const title = document.getElementById("taskTitle").value.trim();
+      const desc = document.getElementById("taskDesc").value.trim();
+      const status = document.getElementById("taskStatus").value;
+
+      if (!title) {
+        alert("Title is required");
+        return;
+      }
+
+      if (editTask) {
+
+        editTask.querySelector("h4").innerText = title;
+        editTask.querySelector("p").innerText = desc;
+
+        document.querySelector(`.column[data-status='${status}']`).appendChild(editTask);
+
+      } else {
+
+        const task = document.createElement("div");
+        task.classList.add("task");
+
+        task.innerHTML = `
+          <h4>${title}</h4>
+          <p>${desc}</p>
+        `;
+
+        task.onclick = () => openEditModal(task);
+
+        document.querySelector(`.column[data-status='${status}']`).appendChild(task);
+
+      }
+
+      modal.style.display = "none";
+      updateCounts();
+
+    };
+
+    // Edit task
+    function openEditModal(task) {
+
+      modal.style.display = "flex";
+
+      document.getElementById("modalTitle").innerText = "Edit Task";
+      deleteBtn.style.display = "inline-block";
+
+      editTask = task;
+
+      document.getElementById("taskTitle").value = task.querySelector("h4").innerText;
+      document.getElementById("taskDesc").value = task.querySelector("p").innerText;
+
+      let col = task.parentElement.getAttribute("data-status");
+
+      document.getElementById("taskStatus").value = col;
+
+    }
+
+    // Delete task
+    deleteBtn.onclick = () => {
+
+      if (editTask) {
+
+        editTask.remove();
+        modal.style.display = "none";
+        updateCounts();
+
+      }
+
+    };
+
+    // Dark mode toggle
+    document.getElementById("themeToggle").onclick = () => {
+
+      document.body.classList.toggle("dark-mode");
+
+    };
+
+    // Initialize counts
+    updateCounts();
+
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+
+</html>
