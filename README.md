@@ -57,6 +57,8 @@ With its clean interface and modal-based task editor, this project helps users *
 - **Javascripts . js** : Runs 
 
 ---
+## 📽️ Video explaining how this project operates: 👇👇
+- https://www.veed.io/view/2e0b0e11-70a2-4e9c-863b-353c278e63a0?source=editor&panel=share
 
 ## 📦 Getting Started
 
